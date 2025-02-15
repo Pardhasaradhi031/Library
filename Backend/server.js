@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require("cors");
-const pool = require('./db');
+const pool = require('./config/db');
 require("dotenv").config();
 
 const app = express()
@@ -26,14 +26,6 @@ async function createTable() {
 createTable();
 
 app.use("/auth", require("./routes/auth"));
-
-app.get('/', (req, res) => {
-  res.send("Hello world!")
-})
-
-app.get('/login', (req, res) => {
-  res.send("Login route")
-})
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`Server Running on port ${process.env.PORT}`)

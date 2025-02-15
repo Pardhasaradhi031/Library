@@ -1,10 +1,54 @@
 import React from "react";
+import { useState } from "react";
 
 const RegisterPage = function () {
+
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: ''
+  });
+
+  const [message, setMessage] = useState("");
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }))
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:5000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("Registration Successfully");
+        setFormData({ name: "", email: "", password: "" }); //clear form
+      } else {
+        setMessage(`Error: ${data.message}`);
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+      setMessage("Something went wrong.");
+    }
+  };
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
         <h2 className="text-3xl font-semibold text-neutral-950 mb-6 text-center">Create an Account</h2>
+        {message && <p className="text-center text-red 500">{message}</p>}
         <form className="space-y-6">
           <div>
             <label
@@ -16,9 +60,11 @@ const RegisterPage = function () {
             <input
               type="text"
               id="full-name"
-              name="full-name"
+              name="name"
               className="w-full border border-neutral-300 rounded-md p-3 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your full name"
+              value={formData.name}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -31,9 +77,11 @@ const RegisterPage = function () {
             <input
               type="email"
               id="email-register"
-              name="email-register"
+              name="email"
               className="w-full border border-neutral-300 rounded-md p-3 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -46,13 +94,16 @@ const RegisterPage = function () {
             <input
               type="password"
               id="password-register"
-              name="password-register"
+              name="password"
               className="w-full border border-neutral-300 rounded-md p-3 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Create a password"
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
           <button
             type="submit"
+            onClick={handleSubmit}
             className="w-full bg-blue-500 text-white rounded-md py-3 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Register

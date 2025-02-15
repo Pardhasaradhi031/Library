@@ -1,6 +1,46 @@
 import React from "react";
+import { useState } from "react";
 
 const LoginPage = function () {
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }))
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch("http://localhost:5000/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Login Successful");
+        setFormData({ email: "", password: "" }); //clear form
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.error("Error: ", error);
+    }
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
@@ -16,9 +56,11 @@ const LoginPage = function () {
             <input
               type="email"
               id="email-login"
-              name="email-login"
+              name="email"
               className="w-full border border-neutral-300 rounded-md p-3 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your email"
+              value={formData.email}
+              onChange={handleChange}
             />
           </div>
           <div>
@@ -31,14 +73,17 @@ const LoginPage = function () {
             <input
               type="password"
               id="password-login"
-              name="password-login"
+              name="password"
               className="w-full border border-neutral-300 rounded-md p-3 text-neutral-950 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleChange}
             />
           </div>
           <button
             type="submit"
             className="w-full bg-blue-500 text-white rounded-md py-3 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onClick={handleSubmit}
           >
             Login
           </button>

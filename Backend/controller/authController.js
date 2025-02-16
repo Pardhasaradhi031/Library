@@ -1,4 +1,5 @@
 const { findUserByEmail, createUser } = require("../models/queries");
+const bcrypt = require("bcrypt");
 
 const registerUser = async (req, res) => {
   try {
@@ -7,7 +8,9 @@ const registerUser = async (req, res) => {
     const existingUser = await findUserByEmail(email);
     if (existingUser) return res.status(400).json({ message: "User already exists" });
 
-    const newUser = await createUser(name, email, password);
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const newUser = await createUser(name, email, hashedPassword);
     res.status(201).json({ message: "User Registered Successfully", user: newUser });
   } catch (error) {
     console.error("Error Registering: ", error);
@@ -22,7 +25,8 @@ const loginUser = async (req, res) => {
     const user = await findUserByEmail(email);
     if (!user) return res.status(400).json({ message: "Invalid email or password" });
 
-    if (password == user.password) {
+    isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (isPasswordMatch) {
       return res.status(201).json({ message: "Login Successfull" });
     }
 

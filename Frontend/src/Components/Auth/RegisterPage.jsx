@@ -1,8 +1,11 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const RegisterPage = function () {
 
+  const navigate = useNavigate();
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -35,7 +38,9 @@ const RegisterPage = function () {
 
       if (response.ok) {
         setMessage("Registration Successfully");
+        localStorage.setItem("token", data.token);
         setFormData({ name: "", email: "", password: "" }); //clear form
+        navigate('/dashboard');
       } else {
         setMessage(`Error: ${data.message}`);
       }

@@ -1,5 +1,6 @@
 const { findUserByEmail, createUser } = require("../models/queries");
 const bcrypt = require("bcrypt");
+const jwtGenerator = require("../utils/jwtGenerator");
 
 const registerUser = async (req, res) => {
   try {
@@ -11,7 +12,14 @@ const registerUser = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = await createUser(name, email, hashedPassword);
-    res.status(201).json({ message: "User Registered Successfully", user: newUser });
+
+    const token = jwtGenerator(newUser.id);
+    res.status(201).json(
+      { message: "User Registered Successfully",
+        user: newUser,
+        token: token,
+      }
+    );
   } catch (error) {
     console.error("Error Registering: ", error);
     res.status(500).json({ message: "Server error" });
@@ -25,12 +33,18 @@ const loginUser = async (req, res) => {
     const user = await findUserByEmail(email);
     if (!user) return res.status(400).json({ message: "Invalid email or password" });
 
-    isPasswordMatch = await bcrypt.compare(password, user.password);
-    if (isPasswordMatch) {
-      return res.status(201).json({ message: "Login Successfull" });
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+      return res.status(400).json({ message: "Invalid Credentials" });
     }
 
-    return res.status(404).json({ messsage: "Invalid Credentials" });
+    const token = jwtGenerator(user.id);
+    return res.status(201).json(
+      {
+        messsage: "Login Successful",
+        token: token,
+      }
+    );
 
   } catch (error) {
     console.error("Error Loggin in: ", error);

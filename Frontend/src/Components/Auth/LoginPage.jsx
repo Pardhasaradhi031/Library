@@ -1,7 +1,10 @@
 import React from "react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 const LoginPage = function () {
+
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -32,7 +35,9 @@ const LoginPage = function () {
       const data = await response.json();
       if (response.ok) {
         console.log("Login Successful");
+        localStorage.setItem("token", data.token);
         setFormData({ email: "", password: "" }); //clear form
+        navigate("/dashboard");
       } else {
         console.log(data.message);
       }

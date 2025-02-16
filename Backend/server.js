@@ -46,6 +46,7 @@ createUsersTable();
 createBooksTable();
 
 app.use("/auth", require("./routes/auth"));
+app.use("/books", require("./routes/bookRoutes"));
 
 app.listen(process.env.PORT || 5000, () => {
   console.log(`Server Running on port ${process.env.PORT}`)

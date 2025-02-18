@@ -12,6 +12,8 @@ const Dashboard = () => {
 
   const [books, setBooks] = useState([]);
   const [message, setMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredBooks, setFilteredBooks] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,9 +27,9 @@ const Dashboard = () => {
     try {
       const response = await fetch("http://localhost:5000/books");
       const data = await response.json();
-  
+
       console.log("Fetched books:", data); // Debugging
-  
+
       if (response.ok) {
         setBooks(Array.isArray(data) ? data : []); // Ensure data is an array
       } else {
@@ -38,7 +40,6 @@ const Dashboard = () => {
       setMessage("Failed to fetch books");
     }
   };
-  
 
   useEffect(() => {
     fetchAllBooks();
@@ -74,10 +75,29 @@ const Dashboard = () => {
     }
   };
 
+  const handleSearch = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (searchQuery == "") {
+      setFilteredBooks([]);
+    } else {
+      setFilteredBooks(books.filter((book) => book.title.toLowerCase().includes(query.toLowerCase())));
+    }
+  };
+
   return (
     <div className="bg-white h-screen">
       <div className="h-16 bg-black flex justify-between items-center px-8 shadow-md">
         <div className="text-white text-lg font-bold">LIBRARY</div>
+        <div className="bg-white w-75 h-10 p-1 rounded-md shadow-sm border border-gray-300">
+          <input
+            type="search"
+            className="w-full p-1 outline-none bg-transparent"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </div>
         <div
           className="text-white text-lg cursor-pointer hover:underline"
           onClick={() => setShowForm(!showForm)}
@@ -86,7 +106,9 @@ const Dashboard = () => {
         </div>
         {showForm && (
           <div className="absolute right-0 top-10 bg-white p-4 rounded-lg shadow-lg w-64">
-            <h2 className="text-black font-bold text-center mb-2">Add a Book</h2>
+            <h2 className="text-black font-bold text-center mb-2">
+              Add a Book
+            </h2>
             <input
               type="text"
               placeholder="Book Title"
@@ -131,14 +153,14 @@ const Dashboard = () => {
       {message && <p className="text-center text-red-500">{message}</p>}
 
       <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {books.map((book) => (
+        {(filteredBooks.length > 0 ? filteredBooks : books).map((book) => (
           <BookCard
-            key={book.id || book.title} // Add unique key
-            title={book.title}
-            author={book.author}
-            genre={book.genre}
-            year={book.year}
-          />
+          key={book.id || book.title} // Add unique key
+          title={book.title}
+          author={book.author}
+          genre={book.genre}
+          year={book.year}
+        />
         ))}
       </div>
     </div>

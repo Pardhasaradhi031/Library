@@ -30,9 +30,8 @@ async function createBooksTable() {
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         author VARCHAR(255) NOT NULL,
-        category VARCHAR(100),
-        availability BOOLEAN DEFAULT true,
-        cover_image TEXT,
+        genre VARCHAR(100),
+        year int,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);

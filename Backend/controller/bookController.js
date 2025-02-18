@@ -2,8 +2,8 @@ const { addBook, getAllBooks, getBookById, updateBook, deleteBook } = require(".
 
 const createBook = async (req, res) => {
   try {
-    const { title, author, category, coverImage } = req.body;
-    const newBook = await addBook(title, author, category, coverImage);
+    const { title, author, genre, year } = req.body;
+    const newBook = await addBook(title, author, genre, year);
     res.status(201).json(newBook);
   } catch (error) {
     console.error("Error adding book: ", error);

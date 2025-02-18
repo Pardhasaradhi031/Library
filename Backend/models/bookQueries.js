@@ -1,16 +1,16 @@
 const pool = require("../config/db");
 
-const addBook = async (title, author, category, coverImage) => {
+const addBook = async (title, author, genre, year) => {
   const result = await pool.query(
-    "INSERT INTO books (title, author, category, coverImage) VALUES ($1, $2, $3, $4) RETURNING *",
-    [title, author, category, coverImage]
+    "INSERT INTO books (title, author, genre, year) VALUES ($1, $2, $3, $4) RETURNING *",
+    [title, author, genre, year]
   );
   return result.rows[0];
 };
 
 const getAllBooks = async () => {
   const result = await pool.query("SELECT * FROM books");
-  return result.rows[0];
+  return result.rows;
 };
 
 const getBookById = async (id) => {
@@ -18,10 +18,10 @@ const getBookById = async (id) => {
   return result.rows[0];
 };
 
-const updateBook = async (id, title, author, category, coverImage) => {
+const updateBook = async (id, title, author, genre, year) => {
   const result = await pool.query(
-    "UPDATE books SET title = $1, author = $2, category = $3, coverImage = $4 WHERE id = $6 RETURNING *",
-    [title, author, category, coverImage, id]
+    "UPDATE books SET title = $1, author = $2, genre = $3, year = $4 WHERE id = $6 RETURNING *",
+    [title, author, genre, year, id]
   );
   return result.rows[0];
 };

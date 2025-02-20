@@ -26,9 +26,16 @@ const updateBook = async (id, title, author, genre, year) => {
   return result.rows[0];
 };
 
+const updateBookStatus = async (id, status) => {
+  const result = await pool.query(
+    "UPDATE books SET availability_status = $1 WHERE id = $2 RETURNING *", [status, id]
+  );
+  return result.rows[0];
+};
+
 const deleteBook = async (id) => {
   await pool.query("DELETE FROM books WHERE id = $1", [id]);
   return { message: "Book Deleted Successfully" };
 };
 
-module.exports = { addBook, getAllBooks, getBookById, updateBook, deleteBook };
+module.exports = { addBook, getAllBooks, getBookById, updateBook, updateBookStatus, deleteBook };

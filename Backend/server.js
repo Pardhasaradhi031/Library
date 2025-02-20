@@ -32,6 +32,8 @@ async function createBooksTable() {
         author VARCHAR(255) NOT NULL,
         genre VARCHAR(100),
         year int,
+        availability_status BOOLEAN DEFAULT TRUE,
+        synopsis TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);

@@ -25,7 +25,6 @@ const Dashboard = () => {
 
   const fetchAllBooks = async () => {
     const token = localStorage.getItem("token");
-    console.log("Stored Token:", token); // Debugging
   
     if (!token) {
       setMessage("Authentication token not found. Please log in.");
@@ -42,7 +41,6 @@ const Dashboard = () => {
       });
   
       const data = await response.json();
-      console.log("Fetched books response:", data);
   
       if (response.status === 401) {
         setMessage("Unauthorized access. Please log in again.");
@@ -143,7 +141,7 @@ const Dashboard = () => {
       {message && <p className="text-red-500 text-center">{message}</p>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-25">
         {(filteredBooks.length > 0 ? filteredBooks : books).map((book) => (
-          <BookCard key={book.id || book.title} title={book.title} author={book.author} genre={book.genre} year={book.year} />
+          <BookCard key={book.id || book.title} bookId={book.id} title={book.title} author={book.author} genre={book.genre} year={book.year} availability_status={book.availability_status} />
         ))}
       </div>
     </div>

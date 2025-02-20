@@ -1,4 +1,4 @@
-const { addBook, getAllBooks, getBookById, updateBook, deleteBook } = require("../models/bookQueries");
+const { addBook, getAllBooks, getBookById, updateBook, deleteBook, updateBookStatus } = require("../models/bookQueries");
 
 const createBook = async (req, res) => {
   try {
@@ -45,6 +45,18 @@ const modifyBook = async (req, res) => {
   }
 };
 
+const modifyBookStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const modifiedStatus = await updateBookStatus(id, status);
+    res.status(200).json(modifiedStatus);
+  } catch (error) {
+    console.error("Error Updating book status: ", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
 const removeBook = async (req, res) => {
   try {
     const { id } = req.params;
@@ -56,4 +68,4 @@ const removeBook = async (req, res) => {
   }
 };
 
-module.exports = { createBook, fetchBooks, fetchBookById, modifyBook, removeBook };
+module.exports = { createBook, fetchBooks, fetchBookById, modifyBook, modifyBookStatus, removeBook };

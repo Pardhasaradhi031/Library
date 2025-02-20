@@ -24,14 +24,34 @@ const Dashboard = () => {
   };
 
   const fetchAllBooks = async () => {
+    const token = localStorage.getItem("token");
+    console.log("Stored Token:", token); // Debugging
+  
+    if (!token) {
+      setMessage("Authentication token not found. Please log in.");
+      return;
+    }
+  
     try {
-      const response = await fetch("http://localhost:5000/books");
+      const response = await fetch("http://localhost:5000/books", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // Ensure "Bearer" is included
+        },
+      });
+  
       const data = await response.json();
-
-      console.log("Fetched books:", data); // Debugging
-
+      console.log("Fetched books response:", data);
+  
+      if (response.status === 401) {
+        setMessage("Unauthorized access. Please log in again.");
+        localStorage.removeItem("token");
+        return;
+      }
+  
       if (response.ok) {
-        setBooks(Array.isArray(data) ? data : []); // Ensure data is an array
+        setBooks(Array.isArray(data) ? data : []);
       } else {
         setMessage(`Error: ${data.message}`);
       }
@@ -40,21 +60,20 @@ const Dashboard = () => {
       setMessage("Failed to fetch books");
     }
   };
+  
 
   useEffect(() => {
     fetchAllBooks();
-  }, []);
+  }, [books.length]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //const token = localStorage.getItem("token");
-
     try {
       const response = await fetch("http://localhost:5000/books", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // "Authorization": `Bearer ${token}`,
+          "Authorization": `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify(formData),
       });
@@ -87,80 +106,44 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="bg-white h-screen">
-      <div className="h-16 bg-black flex justify-between items-center px-8 shadow-md">
-        <div className="text-white text-lg font-bold">LIBRARY</div>
-        <div className="bg-white w-75 h-10 p-1 rounded-md shadow-sm border border-gray-300">
-          <input
-            type="search"
-            className="w-full p-1 outline-none bg-transparent"
-            value={searchQuery}
-            onChange={handleSearch}
-          />
-        </div>
-        <div
-          className="text-white text-lg cursor-pointer hover:underline"
-          onClick={() => setShowForm(!showForm)}
-        >
-          Add Book
-        </div>
-        {showForm && (
-          <div className="absolute right-0 top-10 bg-white p-4 rounded-lg shadow-lg w-64">
-            <h2 className="text-black font-bold text-center mb-2">
-              Add a Book
-            </h2>
-            <input
-              type="text"
-              placeholder="Book Title"
-              className="w-full p-2 border rounded mb-2"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              placeholder="Author Name"
-              className="w-full p-2 border rounded mb-2"
-              name="author"
-              value={formData.author}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              placeholder="Book Genre"
-              className="w-full p-2 border rounded mb-2"
-              name="genre"
-              value={formData.genre}
-              onChange={handleChange}
-            />
-            <input
-              type="text"
-              placeholder="Published Year"
-              className="w-full p-2 border rounded mb-2"
-              name="year"
-              value={formData.year}
-              onChange={handleChange}
-            />
-            <button
-              className="w-full bg-black text-white p-2 rounded hover:bg-gray-800"
-              onClick={handleSubmit}
-            >
-              Submit
-            </button>
-          </div>
-        )}
-      </div>
-      {message && <p className="text-center text-red-500">{message}</p>}
-
-      <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {(filteredBooks.length > 0 ? filteredBooks : books).map((book) => (
-          <BookCard
-          key={book.id || book.title} // Add unique key
-          title={book.title}
-          author={book.author}
-          genre={book.genre}
-          year={book.year}
+    <div className="relative bg-white min-h-screen p-6 rounded-2xl shadow-lg">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Library Dashboard</h1>
+        <input
+          type="search"
+          placeholder="Search books..."
+          className="w-64 px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          value={searchQuery}
+          onChange={handleSearch}
         />
+        <button
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          onClick={() => setShowForm(true)}
+        >
+          ➤ Add New Book
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80 relative">
+            <h2 className="text-lg font-semibold mb-4 text-center">Add a Book</h2>
+            <input type="text" name="title" placeholder="Title" className="w-full p-2 mb-2 border rounded" value={formData.title} onChange={handleChange} />
+            <input type="text" name="author" placeholder="Author" className="w-full p-2 mb-2 border rounded" value={formData.author} onChange={handleChange} />
+            <input type="text" name="genre" placeholder="Genre" className="w-full p-2 mb-2 border rounded" value={formData.genre} onChange={handleChange} />
+            <input type="text" name="year" placeholder="Year" className="w-full p-2 mb-2 border rounded" value={formData.year} onChange={handleChange} />
+            <div className="flex justify-between">
+              <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700" onClick={handleSubmit}>Submit</button>
+              <button className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600" onClick={() => setShowForm(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {message && <p className="text-red-500 text-center">{message}</p>}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 mt-25">
+        {(filteredBooks.length > 0 ? filteredBooks : books).map((book) => (
+          <BookCard key={book.id || book.title} title={book.title} author={book.author} genre={book.genre} year={book.year} />
         ))}
       </div>
     </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 
 const WelcomePage = () => {
   return (
@@ -14,11 +15,11 @@ const WelcomePage = () => {
         </div>
       </main>
       <footer className="w-full text-center mt-8">
-				<a href="/register">
+				<Link to={"/auth/register"}>
         <button className="bg-primary-500 text-primary-50 py-2 px-4 rounded-md hover:bg-primary-600 cursor-pointer">
           Explore Now
         </button>
-				</a>
+				</Link>
       </footer>
     </div>
   );

@@ -5,6 +5,9 @@ import { useNavigate } from "react-router";
 const RegisterPage = function () {
 
   const navigate = useNavigate();
+  const [token, setToken] = useState('');
+
+  console.log(token)
   
   const [formData, setFormData] = useState({
     name: '',
@@ -35,6 +38,7 @@ const RegisterPage = function () {
       });
 
       const data = await response.json();
+      setToken(data);
 
       if (response.ok) {
         setMessage("Registration Successfully");
@@ -117,9 +121,9 @@ const RegisterPage = function () {
         <div className="mt-6 text-center">
           <p className="text-sm text-neutral-600">
             Already have an account?{" "}
-            <a href="/login" className="text-blue-500 hover:text-blue-700">
+            <Link  to="/auth/login" className="text-blue-500 hover:text-blue-700">
               Login here
-            </a>
+            </Link>
           </p>
         </div>
       </div>

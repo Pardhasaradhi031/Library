@@ -20,7 +20,7 @@ const getBookById = async (id) => {
 
 const updateBook = async (id, title, author, genre, year) => {
   const result = await pool.query(
-    "UPDATE books SET title = $1, author = $2, genre = $3, year = $4 WHERE id = $6 RETURNING *",
+    "UPDATE books SET title = $1, author = $2, genre = $3, year = $4 WHERE id = $5 RETURNING *",
     [title, author, genre, year, id]
   );
   return result.rows[0];

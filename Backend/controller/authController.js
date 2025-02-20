@@ -13,9 +13,10 @@ const registerUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     const newUser = await createUser(name, email, hashedPassword);
 
-    const token = jwtGenerator(newUser.id);
+    const token = jwtGenerator(newUser.id, newUser.name, newUser.email);
     res.status(201).json(
-      { message: "User Registered Successfully",
+      {
+        message: "User Registered Successfully",
         user: newUser,
         token: token,
       }
@@ -38,7 +39,7 @@ const loginUser = async (req, res) => {
       return res.status(400).json({ message: "Invalid Credentials" });
     }
 
-    const token = jwtGenerator(user.id);
+    const token = jwtGenerator(user.id, user.name, user.email);
     return res.status(201).json(
       {
         messsage: "Login Successful",

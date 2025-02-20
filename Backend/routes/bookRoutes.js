@@ -1,12 +1,13 @@
 const express = require("express");
 const { createBook, fetchBooks, fetchBookById, modifyBook, removeBook } = require("../controller/bookController");
+const verifyToken = require("../utils/verifyToken");
 
 const router = express.Router();
 
-router.post("/", createBook);
-router.get("/", fetchBooks);
-router.get("/:id", fetchBookById);
-router.put("/:id", modifyBook);
-router.delete("/:id", removeBook);
+router.post("/", verifyToken, createBook);
+router.get("/", verifyToken, fetchBooks);
+router.get("/:id", verifyToken, fetchBookById);
+router.put("/:id", verifyToken, modifyBook);
+router.delete("/:id", verifyToken, removeBook);
 
 module.exports = router;
